@@ -59,7 +59,15 @@ fi
 chmod +x "${PACKAGE_DIR}/bin/typesense-server"
 
 # Strip binary (may not work on signed binaries)
-strip "${PACKAGE_DIR}/bin/typesense-server" 2>/dev/null || true
+# Upstream release binaries are already stripped and signed; strip here
+# invalidated the signature (the published meilisearch was killed on launch)
+# for ~2% smaller downloads. Ship them as-is.
+# Smoke test: a binary macOS won't run (bad signature, missing library) must
+# fail the build instead of being published. This is how a stripped, unrunnable
+# meilisearch shipped before.
+for bin in "${PACKAGE_DIR}/bin/typesense-server"; do
+    "$bin" --version >/dev/null || { echo "❌ $bin does not run" >&2; exit 1; }
+done
 
 # Create tarball
 TARBALL_NAME="typesense-${VERSION}-macos-${ARCH}.tar.gz"
