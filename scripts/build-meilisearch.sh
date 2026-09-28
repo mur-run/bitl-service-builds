@@ -45,7 +45,15 @@ cp "${BINARY_FILE}" "${PACKAGE_DIR}/bin/meilisearch"
 chmod +x "${PACKAGE_DIR}/bin/meilisearch"
 
 # Strip binary
-strip "${PACKAGE_DIR}/bin/meilisearch" 2>/dev/null || true
+# Upstream release binaries are already stripped and signed; strip here
+# invalidated the signature (the published meilisearch was killed on launch)
+# for ~2% smaller downloads. Ship them as-is.
+# Smoke test: a binary macOS won't run (bad signature, missing library) must
+# fail the build instead of being published. This is how a stripped, unrunnable
+# meilisearch shipped before.
+for bin in "${PACKAGE_DIR}/bin/meilisearch"; do
+    "$bin" --version >/dev/null || { echo "❌ $bin does not run" >&2; exit 1; }
+done
 
 # Create tarball
 TARBALL_NAME="meilisearch-${VERSION}-macos-${ARCH}.tar.gz"

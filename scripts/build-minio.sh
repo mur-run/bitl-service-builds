@@ -60,8 +60,15 @@ cp "${MC_FILE}" "${PACKAGE_DIR}/bin/mc"
 chmod +x "${PACKAGE_DIR}/bin/minio" "${PACKAGE_DIR}/bin/mc"
 
 # Strip binaries (may not work on signed binaries)
-strip "${PACKAGE_DIR}/bin/minio" 2>/dev/null || true
-strip "${PACKAGE_DIR}/bin/mc" 2>/dev/null || true
+# Upstream release binaries are already stripped and signed; strip here
+# invalidated the signature (the published meilisearch was killed on launch)
+# for ~2% smaller downloads. Ship them as-is.
+# Smoke test: a binary macOS won't run (bad signature, missing library) must
+# fail the build instead of being published. This is how a stripped, unrunnable
+# meilisearch shipped before.
+for bin in "${PACKAGE_DIR}/bin/minio" "${PACKAGE_DIR}/bin/mc"; do
+    "$bin" --version >/dev/null || { echo "❌ $bin does not run" >&2; exit 1; }
+done
 
 # Create tarball
 TARBALL_NAME="minio-${VERSION}-macos-${ARCH}.tar.gz"
