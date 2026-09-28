@@ -29,8 +29,8 @@
             "16.4": {
               "arm64": {
                 "url": "https://github.com/mur-run/bitl-service-builds/releases/download/postgresql-16.4/postgresql-16.4-macos-arm64.tar.gz",
-                "sha256": "7c17cda2f2c152f2c796e74afb08001096956bd42b797859438307bcb10cb508",
-                "size": 7130663,
+                "sha256": "ff5154ac9a20b90f278ada113178d97f1ee9ef8ee088807ca321e0e78be1c35f",
+                "size": 7459710,
                 "binaries": ["postgres", "psql", "pg_ctl", "initdb", "pg_dump", "pg_restore"]
               }
             }
@@ -86,8 +86,8 @@
             "1.11.3": {
               "arm64": {
                 "url": "https://github.com/mur-run/bitl-service-builds/releases/download/meilisearch-1.11.3/meilisearch-1.11.3-macos-arm64.tar.gz",
-                "sha256": "8334363fa6c8477f0474cc226de1783274e2f1520843366cc7a9fa7863464930",
-                "size": 11229543,
+                "sha256": "4cb5447778c68fbf8b6bd929d00c024d4fc81032fefbc6e5f22af0aabab2b768",
+                "size": 84642682,
                 "binaries": ["meilisearch"]
               }
             }
