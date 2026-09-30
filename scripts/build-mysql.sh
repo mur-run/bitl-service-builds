@@ -99,6 +99,27 @@ cp "${BUILD_DIR}/build/runtime_output_directory/mysqldump" "${PACKAGE_DIR}/bin/"
 # Copy required libraries
 cp -R "${BUILD_DIR}/build/library_output_directory/"*.dylib "${PACKAGE_DIR}/lib/" 2>/dev/null || true
 
+# Copy share/ — mysqld resolves lc-messages-dir to <basedir>/share, so without
+# share/english/errmsg.sys `mysqld --initialize-insecure` aborts with MY-010338.
+# comp_err writes the compiled errmsg.sys files into the build tree's share/;
+# character set definitions only exist in the source tree.
+echo "📚 Copying share/ (error messages, charsets)..."
+mkdir -p "${PACKAGE_DIR}/share"
+if [ -d "${BUILD_DIR}/build/share" ]; then
+    cp -R "${BUILD_DIR}/build/share/"* "${PACKAGE_DIR}/share/"
+fi
+if [ -d "${BUILD_DIR}/src/share/charsets" ]; then
+    cp -R "${BUILD_DIR}/src/share/charsets" "${PACKAGE_DIR}/share/"
+fi
+
+# Refuse to publish a tarball that cannot initialize a data directory.
+for required in "share/english/errmsg.sys" "share/charsets/Index.xml"; do
+    if [ ! -f "${PACKAGE_DIR}/${required}" ]; then
+        echo "❌ Package is missing ${required} — mysqld --initialize would fail. Aborting."
+        exit 1
+    fi
+done
+
 # Fix library paths (rpath) so binaries can find bundled dylibs
 echo "🔗 Fixing library paths..."
 for bin in "${PACKAGE_DIR}/bin/"*; do
